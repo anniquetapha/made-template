@@ -1,0 +1,111 @@
+// SPDX-FileCopyrightText: 2023 Friedrich-Alexander-Universitat Erlangen-Nurnberg
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
+pipeline GPAPerCapitaPipeline {
+
+    block GPAPerCapitaExtractor oftype HttpExtractor {
+        url: "https://thedocs.worldbank.org/en/doc/7d852628d96b9411d43e5d36d5dff941-0050062022/original/Graphs-Chapter-5-02082022.xlsx";
+    }
+
+
+    block GPAPerCapitaXLSXInterpreter oftype XLSXInterpreter { }
+
+    block GPAPerCapitaSheetpicker oftype SheetPicker {
+        sheetName: 'Figure S5.1.2';
+    }
+
+    block NameHeaderWriter oftype CellWriter {
+        at: range P2:S2;
+        write: [
+        "Country Code",
+        "Economy",
+        "GDP per Capita",
+        "Bond Issuance Share"
+        ];
+    }
+
+    block GPAPerCapitaXLSXDataSelector oftype CellRangeSelector {
+        select: range P2:S45;
+    }
+
+    block BoundColumnDeleter oftype ColumnDeleter {
+        delete: [column B, column C];
+    }
+
+    block gdpPerCapitaColumnDeleter oftype ColumnDeleter {
+        delete: [column B, column D];
+    }
+
+
+    block BoundTableInterpreter oftype TableInterpreter {
+        header: false;
+        columns: [
+        "Country Code" oftype validISO,
+        "Bond Issuance Share" oftype validBound
+        ];
+    }
+
+    block CapitaTableInterpreter oftype TableInterpreter {
+        header: false;
+        columns: [
+        "Country Code" oftype validISO,
+        "GDP per Capita" oftype validCapita,
+        ];
+    }
+
+    block bondIssuanceLoader oftype SQLiteLoader {
+
+        table: "bondIssuance";
+        file: "country-stats.sqlite";
+    }
+
+    block gdpPerCapitaLoader oftype SQLiteLoader {
+
+        table: "gdpPerCapita";
+        file: "country-stats.sqlite";
+    }
+
+    valuetype validISO oftype text {
+        constraints: [
+            getValidISO,
+        ];
+    }
+    valuetype validCapita oftype text {
+        constraints: [
+            getPositivecapita,
+        ];
+    }
+    valuetype validBound oftype text {
+        constraints: [
+            getBound,
+        ];
+    }
+    constraint getValidISO on text: value matches /^[A-Z]{3}$/;
+
+    constraint getPositivecapita oftype RangeConstraint {
+        lowerBound: 0.01;
+    }
+    constraint getBound oftype RangeConstraint {
+        lowerBound: 0;
+        upperBound: 1;
+    }
+
+
+	GPAPerCapitaExtractor
+        -> GPAPerCapitaXLSXInterpreter
+		-> GPAPerCapitaSheetpicker
+		-> NameHeaderWriter
+        -> GPAPerCapitaXLSXDataSelector;
+
+    GPAPerCapitaXLSXDataSelector
+        -> BoundColumnDeleter
+        -> BoundTableInterpreter
+        -> bondIssuanceLoader;
+
+    GPAPerCapitaXLSXDataSelector
+        -> gdpPerCapitaColumnDeleter
+        -> CapitaTableInterpreter
+        -> gdpPerCapitaLoader;
+
+}
