@@ -71,12 +71,12 @@ pipeline GPAPerCapitaPipeline {
             getValidISO,
         ];
     }
-    valuetype validCapita oftype text {
+    valuetype validCapita oftype decimal {
         constraints: [
             getPositivecapita,
         ];
     }
-    valuetype validBound oftype text {
+    valuetype validBound oftype decimal {
         constraints: [
             getBound,
         ];
@@ -85,12 +85,10 @@ pipeline GPAPerCapitaPipeline {
 
     constraint getPositivecapita oftype RangeConstraint {
         lowerBound: 0;
-        lowerBoundInclusive: false;
     }
     constraint getBound oftype RangeConstraint {
         lowerBound: 0;
-        lowerBoundInclusive: true;
-        upperBoundInclusive: true;
+        upperBound: 1;
     }
 
 
