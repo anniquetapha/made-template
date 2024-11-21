@@ -19,7 +19,7 @@ pipeline GPAPerCapitaPipeline {
         at: range P2:S2;
         write: [
         "Country Code",
-        "Economy",
+        "",
         "GDP per Capita",
         "Bond Issuance Share"
         ];
