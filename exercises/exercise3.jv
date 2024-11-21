@@ -41,7 +41,7 @@ pipeline GPAPerCapitaPipeline {
     block BoundTableInterpreter oftype TableInterpreter {
         header: false;
         columns: [
-        "Country Code" oftype CountryCodeAlpha3,
+        "Country Code" oftype validISO,
         "Bond Issuance Share" oftype validBound
         ];
     }
@@ -49,7 +49,7 @@ pipeline GPAPerCapitaPipeline {
     block CapitaTableInterpreter oftype TableInterpreter {
         header: false;
         columns: [
-        "Country Code" oftype CountryCodeAlpha3,
+        "Country Code" oftype validISO,
         "GDP per Capita" oftype validCapita,
         ];
     }
@@ -84,13 +84,11 @@ pipeline GPAPerCapitaPipeline {
     constraint getValidISO on text: value matches /^[A-Z]{3}$/;
 
     constraint getPositivecapita oftype RangeConstraint {
-        lowerBound: 0.01;
+        lowerBound: 0;
     }
     constraint getBound oftype RangeConstraint {
         lowerBound: 0;
         upperBound: 1;
-        lowerBoundInclusive: true;
-        upperBoundInclusive: true;
     }
 
 
