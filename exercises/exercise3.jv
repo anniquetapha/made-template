@@ -19,7 +19,7 @@ pipeline GPAPerCapitaPipeline {
         at: range P2:S2;
         write: [
         "Country Code",
-        "",
+        "Economy",
         "GDP per Capita",
         "Bond Issuance Share"
         ];
@@ -85,10 +85,12 @@ pipeline GPAPerCapitaPipeline {
 
     constraint getPositivecapita oftype RangeConstraint {
         lowerBound: 0;
+        lowerBoundInclusive: false;
     }
     constraint getBound oftype RangeConstraint {
         lowerBound: 0;
-        upperBound: 1;
+        lowerBoundInclusive: true;
+        upperBoundInclusive: true;
     }
 
 
