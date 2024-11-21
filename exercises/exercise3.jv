@@ -63,7 +63,7 @@ pipeline GPAPerCapitaPipeline {
     block gdpPerCapitaLoader oftype SQLiteLoader {
 
         table: "gdpPerCapita";
-        file: "./country-stats.sqlite";
+        file: "country-stats.sqlite";
     }
 
     valuetype validISO oftype text {
