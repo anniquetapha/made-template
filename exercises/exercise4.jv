@@ -1,0 +1,85 @@
+pipeline TemperatureBatteryPipeline
+{
+    block DatasetDownloader oftype HttpExtractor {
+        url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
+    }
+    block ArchiveExtractor oftype ArchiveInterpreter {
+         archiveType: "zip";
+    }
+    block CSVFilePicker oftype FilePicker { 
+        path: "/data.csv";
+    }
+    block CSVParser oftype CSVInterpreter {
+        delimiter: ";"; 
+    }
+    block TextInterpreter oftype TextFileInterpreter {
+
+    }
+    block ColRemover oftype ColumnDeleter { 
+        delete: [column F, column G, column H, column I]; 
+    }
+    block DataRangeSelector oftype CellRangeSelector {
+        select: range A1:K*;
+    }
+    transform CelsiusToFahrenheit
+    {
+        from celsius oftype decimal;
+        to fahrenheit oftype decimal;
+
+        fahrenheit: (celsius * 9/5) + 32;
+    }
+    block DataInterpreter oftype TableInterpreter {
+        header: false;
+        columns: [
+            "id" oftype validId, "producer" oftype text, "model" oftype text, "month" oftype validMonth,
+            "temperature" oftype decimal, "battery_temperature" oftype decimal
+        ];
+    }
+    block TemperatureConverter oftype TableTransformer
+    {
+        inputColumns: ['temperature'];
+        outputColumn: 'temperature';
+        uses: CelsiusToFahrenheit;
+    }
+    block BatteryTemperatureConverter oftype TableTransformer 
+    {
+        inputColumns: ['battery_temperature'];
+        outputColumn: 'battery_temperature';
+        uses: CelsiusToFahrenheit;
+    }
+    block SQLiteDataLoader oftype SQLiteLoader 
+    {
+        table: "temperatures"; 
+        file: "./temperatures.sqlite"; 
+    }
+    valuetype validId oftype integer {
+        constraints: [
+            getValId,
+        ];
+    }
+    valuetype validMonth oftype integer {
+        constraints: [
+            getValMonth,
+        ];
+    }
+    constraint getValId oftype RangeConstraint {
+        lowerBound: 0;
+    }
+
+    constraint getValMonth oftype RangeConstraint {
+        lowerBound: 1;
+        upperBound: 12;
+    }
+
+    DatasetDownloader
+        ->ArchiveExtractor
+        ->CSVFilePicker
+        ->TextInterpreter
+        ->CSVParser
+        ->DataRangeSelector
+        ->ColRemover
+        ->DataInterpreter
+        ->TemperatureConverter
+        ->BatteryTemperatureConverter
+        ->SQLiteDataLoader;
+}
