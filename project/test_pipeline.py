@@ -6,9 +6,16 @@ import sqlite3
 class TestDataPipeline(unittest.TestCase):
 
     def setUp(self):
-        self.downloaded_US_Chronic_path = "../data/downloaded_US_Chronic.csv"
-        self.downloaded_NCHS_path = "../data/downloaded_NCHS.csv"
-        self.processed_data_path = "../data/processed_data.db"
+        # Get the absolute path to the directory containing this script
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Construct file paths relative to the script directory
+        self.downloaded_US_Chronic_path = os.path.join(script_dir, "../data/downloaded_US_Chronic.csv")
+        self.downloaded_NCHS_path = os.path.join(script_dir, "../data/downloaded_NCHS.csv")
+        self.processed_data_path = os.path.join(script_dir, "../data/processed_data.db")
+        # self.downloaded_US_Chronic_path = "../data/downloaded_US_Chronic.csv"
+        # self.downloaded_NCHS_path = "../data/downloaded_NCHS.csv"
+        # self.processed_data_path = "../data/processed_data.db"
 
     def test_data_download(self):
         self.assertTrue(os.path.isfile(self.downloaded_US_Chronic_path), "Chronic dataset not downloaded")
