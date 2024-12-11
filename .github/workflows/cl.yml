@@ -27,16 +27,7 @@ jobs:
       - name: Grant execute permissions to test.sh
         run: chmod +x $GITHUB_WORKSPACE/project/test.sh
 
-      - name: Grant execute permissions to pipeline.sh
-        run: chmod +x $GITHUB_WORKSPACE/project/pipeline.sh
-
-      - name: List files in workspace
-        run: ls -R $GITHUB_WORKSPACE
-
-      - name: Run Pipeline
-        run: /project/pipeline.sh
-
       - name: Run Tests
         working-directory: $GITHUB_WORKSPACE/project
-        run: ./test.sh
+        run: ./project/test.sh
 
