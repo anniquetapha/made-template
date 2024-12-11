@@ -34,7 +34,7 @@ jobs:
         run: ls -R $GITHUB_WORKSPACE
 
       - name: Run Pipeline
-        run: ./project/pipeline.sh
+        run: /project/pipeline.sh
 
       - name: Run Tests
         working-directory: $GITHUB_WORKSPACE/project
