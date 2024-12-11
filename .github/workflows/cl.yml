@@ -28,6 +28,6 @@ jobs:
         run: chmod +x $GITHUB_WORKSPACE/project/test.sh
 
       - name: Run Tests
-        working-directory: $GITHUB_WORKSPACE/project
+        working-directory: project
         run: ./project/test.sh
 
