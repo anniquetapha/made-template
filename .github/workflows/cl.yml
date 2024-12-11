@@ -31,7 +31,7 @@ jobs:
         run: chmod +x $GITHUB_WORKSPACE/project/pipeline.sh
 
       - name: Run Pipeline
-        run: $GITHUB_WORKSPACE/project/pipeline.sh
+        run: ./project/pipeline.sh
 
       - name: Run Tests
         run: $GITHUB_WORKSPACE/project/test.sh
