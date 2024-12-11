@@ -25,9 +25,8 @@ jobs:
           python -m pip install requests
 
       - name: Grant execute permissions to test.sh
-        run: chmod +x $GITHUB_WORKSPACE/project/test.sh
+        run: chmod +x project/test.sh
 
       - name: Run Tests
-        working-directory: project
         run: ./project/test.sh
 
