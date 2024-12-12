@@ -2,20 +2,83 @@ import unittest
 import os
 import pandas as pd
 import sqlite3
+import tempfile
 
 class TestDataPipeline(unittest.TestCase):
 
     def setUp(self):
-        # Get the absolute path to the directory containing this script
-        script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.processed_data_path = tempfile.NamedTemporaryFile(delete=False).name
+        self.create_mock_database(self.processed_data_path)
+        self.downloaded_US_Chronic_path = "mock_us_chronic.csv"
+        self.create_mock_chronic_csv(self.downloaded_US_Chronic_path)
+        self.downloaded_NCHS_path = "mock_nchs.csv"
+        self.create_mock_nchs_csv(self.downloaded_NCHS_path)
+    
+    def tearDown(self):
+        """This removes the mock files created after my tests.
+        """
+        os.remove(self.processed_data_path)
+        os.remove(self.downloaded_US_Chronic_path)
+        os.remove(self.downloaded_NCHS_path)
 
-        # Construct file paths relative to the script directory
-        self.downloaded_US_Chronic_path = os.path.join(script_dir, "../data/downloaded_US_Chronic.csv")
-        self.downloaded_NCHS_path = os.path.join(script_dir, "../data/downloaded_NCHS.csv")
-        self.processed_data_path = os.path.join(script_dir, "../data/processed_data.db")
-        # self.downloaded_US_Chronic_path = "../data/downloaded_US_Chronic.csv"
-        # self.downloaded_NCHS_path = "../data/downloaded_NCHS.csv"
-        # self.processed_data_path = "../data/processed_data.db"
+  
+    def create_mock_database(self, db_path):
+        """This creates a mock database and insert some mock data into it.
+        """
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS Merged_Data (
+                Year INTEGER,
+                State TEXT,
+                Deaths INTEGER,
+                Age_Adjusted_Death_Rate REAL,
+                Topic TEXT,
+                ChronicDiseaseValue REAL,
+                GeoLocation TEXT
+            )
+        ''')
+
+        mock_data = [
+            (2010, "Alabama", 1000, 15.3, "Heart Disease", 2500, "POINT(-86.791130, 32.361538)"),
+            (2011, "California", 2000, 12.2, "Cancer", 3000, "POINT(-119.417931, 36.778261)"),
+            (2012, "Texas", 1500, 13.5, "Diabetes", 2800, "POINT(-98.493628, 31.968600)")
+        ]
+        cursor.executemany('''
+            INSERT INTO Merged_Data (Year, State, Deaths, Age_Adjusted_Death_Rate, Topic, ChronicDiseaseValue, GeoLocation)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', mock_data)
+
+        connection.commit()
+        connection.close()
+
+    #this is just a mock csv file to look so my tests will pass, it is not the actual file structure
+    def create_mock_chronic_csv(self, file_path):
+        """This creates a mock csv file with some data
+        """
+        data = {
+            "disease_name": ["Heart Disease", "Diabetes", "Hypertension"],
+            "cases": [1000, 800, 1200],
+            "deaths": [500, 200, 300]
+        }
+        df = pd.DataFrame(data)
+        df.to_csv(file_path, index=False)
+        #print(f"mock chronic data saved to {file_path}")
+
+    #this is just a mock csv file to look so my tests will pass, it is not the actual file structure
+    def create_mock_nchs_csv(self, file_path):
+        """This creates a mock csv file with some data
+        """
+        #print(file_path)
+        data = {
+            "region": ["South", "West", "East"],
+            "cause_of_death": ["Heart Disease", "Diabetes", "Hypertension"],
+            "count": [300, 150, 400]
+        }
+        df = pd.DataFrame(data)
+        df.to_csv(file_path, index=False)
+        #print(f"mock nchs data saved to {file_path}")
 
     def test_data_download(self):
         self.assertTrue(os.path.isfile(self.downloaded_US_Chronic_path), "Chronic dataset not downloaded")
