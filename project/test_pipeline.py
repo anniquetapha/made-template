@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import sqlite3
 import tempfile
-from pipeline import download_and_save_data, process_and_merge_datasets
+#from pipeline import download_and_save_data, process_and_merge_datasets
 
 class TestDataPipeline(unittest.TestCase):
 
