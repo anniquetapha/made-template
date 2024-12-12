@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import sqlite3
 import tempfile
+from pipeline import download_and_save_data, process_and_merge_datasets
 
 class TestDataPipeline(unittest.TestCase):
 
@@ -79,6 +80,45 @@ class TestDataPipeline(unittest.TestCase):
         df = pd.DataFrame(data)
         df.to_csv(file_path, index=False)
         #print(f"mock nchs data saved to {file_path}")
+
+    # def test_pipeline_execution(self):
+    #    """This executes the data pipeline by downloading and processing it
+    #    """
+    #     chronic_path = "../data/downloaded_US_Chronic.csv"
+    #     nchs_path = "../data/downloaded_NCHS.csv"
+    #     output_db = "../data/processed_data.db"
+    #     output_table = "Merged_Data"
+    #     output_csv = "../data/merged_data.csv"
+    #     selected_columns_chronic = ['YearStart', 'LocationDesc', 'Topic', 'Question', 'DataValue', 'DataValueType', 'Stratification1', 'GeoLocation']
+    #     selected_columns_nchs = ['Year', 'State', 'Cause Name', 'Deaths', 'Age-adjusted Death Rate']
+    #     clean_columns_chronic = ['Year', 'State', 'Topic', 'ChronicDiseaseValue', 'Cause_Name']
+    #     clean_columns_merged = ['Deaths', 'Age_Adjusted_Death_Rate']
+    #     topic_to_cause_mapping = {
+    #         "Cancer": "Cancer",
+    #         "Diabetes": "Diabetes",
+    #         "Cardiovascular Disease": "Heart Disease",
+    #         "Chronic Kidney Disease": "Kidney Disease",
+    #         "Immunization": "Influenza and Pneumonia",
+    #         "Chronic Obstructive Pulmonary Disease": "CLRD"
+    #     }
+
+    #     US_Chronic_url = "https://data.cdc.gov/api/views/g4ie-h725/rows.csv?accessType=DOWNLOAD"
+    #     NCHS_url = "https://data.cdc.gov/api/views/bi63-dtpu/rows.csv?accessType=DOWNLOAD"
+
+    #     # Call the pipeline functions
+    #     download_and_save_data(US_Chronic_url, chronic_path)
+    #     download_and_save_data(NCHS_url, nchs_path)
+
+    #     process_and_merge_datasets(
+    #         chronic_path, nchs_path, 
+    #         selected_columns_chronic, selected_columns_nchs, 
+    #         output_db, output_table, 
+    #         output_csv, clean_columns_chronic, clean_columns_merged, 
+    #         topic_to_cause_mapping
+    #     )
+
+    #     self.assertTrue(os.path.exists(output_db))
+    #     self.assertTrue(os.path.exists(output_csv))
 
     def test_data_download(self):
         self.assertTrue(os.path.isfile(self.downloaded_US_Chronic_path), "Chronic dataset not downloaded")
