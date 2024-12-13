@@ -37,8 +37,8 @@ pipeline StopsPipeline {
         ];
     }
         constraint Year oftype RangeConstraint {
-        lowerBound: 2001; 
-        upperBound: 2001; 
+        lowerBound: 1925; 
+        upperBound: 1925; 
     }
 
         valuetype StopsCoordinates oftype decimal {
