@@ -1,3 +1,5 @@
 .DS_Store
 /data/*
+/project/analysis-report.ipynb
+/project/analysis.ipynb
 !/data/.gitkeep
